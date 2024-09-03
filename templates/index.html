@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notepad Tracker</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://cdn.ckeditor.com/4.10.0/standard/ckeditor.js"></script>
+</head>
+<body>
+    <center><h1 class="app_title">Notepad Tracker</h1></center>
+    
+    <form class="notepad-form" method="post" onsubmit="formSubmit(event)">
+        <textarea name="editorContent" id="editor1"></textarea>
+        <input class="save-btn" type="submit" value="Save" />
+    </form>
+    
+    <script>
+        function debounce(func,waitingTime){
+            let timeout;
+            return function(...args){
+                clearTimeout(timeout);
+                timeout=setTimeout(()=>func.apply(this,args),waitingTime)
+
+            }  
+
+        }
+
+        function saveContent(content){
+            fetch("/create",{
+                method:"POST",
+                headers:{
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `ckeditor=${encodeURIComponent(content)}`
+            })
+            
+        
+        }
+
+
+        CKEDITOR.replace('editor1');
+
+        function stripHTML(html) {
+            const temporaryDivElement = document.createElement("div");
+            temporaryDivElement.innerHTML = html;
+            return temporaryDivElement.textContent || temporaryDivElement.innerText || "";
+        }
+
+        const editorInstance = CKEDITOR.instances.editor1;
+
+
+editorInstance.on('change', debounce(function() {
+    const htmlcontent = editorInstance.getData();
+    const content = stripHTML(htmlcontent)
+    console.log(content);
+    saveContent(content);
+}, 5000));  // 5000 milliseconds debounce time
+
+
+        function formSubmit(e) {
+            e.preventDefault();
+            const content = CKEDITOR.instances.editor1.getData();
+            saveContent(content)
+        }
+    </script>
+</body>
+</html>
