@@ -28,11 +28,15 @@ def commit_changes(repo, commit_message,remote_url):
         
         if not repo.remotes:
             repo.create_remote("origin",remote_url)
-
         origin = repo.remotes.origin
-        origin.push()
-        print('Changes committed and pushed successfully.')
-    
+        try:
+            origin.push()
+            print('Changes committed and pushed successfully.')
+        except :
+            print(f"Push failed.")
+            print("Setting upstream branch and retrying push...")
+            current_branch = repo.active_branch.name
+            repo.git.push('--set-upstream', 'origin', current_branch)
     else:
         print('No changes to commit.')
 
