@@ -7,10 +7,12 @@ import os
 app = Flask(__name__)
 ckeditor = CKEditor(app)
 
-app.config.from_pyfile('settings.py')
-repo_path = os.getcwd()  
 
+
+#Config for remote repo
+repo_path = os.getcwd()  
 commit_message = 'Added notes'
+remote_url="https://github.com/rajksd9/notepad-tracker.git"
 
 @app.route("/")
 def home():
@@ -26,7 +28,7 @@ def createNote():
         if data:
             save_file_to_local(data)
             repo = check_git(repo_path)
-            commit_changes(repo, commit_message)
+            commit_changes(repo, commit_message,remote_url)
         
             
 

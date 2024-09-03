@@ -20,18 +20,19 @@ def check_git(repo_path):
     
     return repo
 
-def commit_changes(repo, commit_message):
+def commit_changes(repo, commit_message,remote_url):
     if repo.is_dirty() or len(repo.untracked_files)>0:
         print("Changes detected. Committing...")
         repo.git.add(A=True)
         repo.index.commit(commit_message)
         
-        if repo.remotes:
-            origin = repo.remotes.origin
-            origin.push()
-            print('Changes committed and pushed successfully.')
-        else:
-            print('Changes committed successfully but no remote repository found.')
+        if not repo.remotes:
+            repo.create_remote("origin",remote_url)
+
+        origin = repo.remotes.origin
+        origin.push()
+        print('Changes committed and pushed successfully.')
+    
     else:
         print('No changes to commit.')
 
